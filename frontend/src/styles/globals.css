@@ -1,0 +1,136 @@
+/* Reset e base */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tipografia básica */
+h1, h2, h3, h4, h5, h6 { margin: 0 0 0.5rem; line-height: 1.2; }
+p { margin: 0 0 0.75rem; }
+small { color: var(--muted); }
+
+/* Links com toque MSN */
+a {
+  color: var(--msn-primary);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+/* Formulários */
+input, textarea, select {
+  font: inherit;
+  color: inherit;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--msn-primary);
+  box-shadow: 0 0 0 3px rgba(0,162,237,0.15);
+}
+
+/* Botões (base) — use tbm as classes msn-button do theme.css */
+button {
+  font: inherit;
+  color: inherit;
+  background: var(--panel, #fff);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Imagens e listas */
+img { max-width: 100%; display: block; }
+ul, ol { margin: 0; padding-left: 1.25rem; }
+
+/* Seleção e foco global */
+::selection {
+  background: rgba(0,162,237,0.25);
+  color: inherit;
+}
+:focus-visible {
+  outline: 3px solid rgba(0,162,237,0.35);
+  outline-offset: 2px;
+}
+
+/* Barras de rolagem globais (match com msn-scroll do theme.css) */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: #d7e6f7;
+  border-radius: 999px;
+  border: 2px solid #f3f8ff;
+}
+* { scrollbar-color: #d7e6f7 transparent; scrollbar-width: thin; }
+
+/* Utilitários rápidos */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Cartões e painéis genéricos no estilo MSN */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+/* Separador suave */
+.separator {
+  height: 1px;
+  background: var(--border);
+  margin: 12px 0;
+}
+
+/* Badges de status (harmoniza com presence-dot) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  background: #f7fbff;
+}
+.badge .dot {
+  width: 8px; height: 8px; border-radius: 999px;
+}
+.badge.online  .dot { background: var(--msn-green); }
+.badge.away    .dot { background: var(--msn-yellow); }
+.badge.busy    .dot { background: var(--msn-red); }
+.badge.offline .dot { background: #94a3b8; }
+
+/* Animação “nudge” estilo MSN */
+@keyframes msn-nudge {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-2px, 0); }
+  40% { transform: translate(2px, 0); }
+  60% { transform: translate(-1px, 0); }
+  80% { transform: translate(1px, 0); }
+}
+.nudge {
+  animation: msn-nudge 180ms ease-in-out 0s 3;
+}
