@@ -1,68 +1,38 @@
-import Fastify from "fastify";
-import { createServer } from "http";
-import { userRoutes } from "./interfaces/routes/userRoute";
-import { authRoutes } from './interfaces/routes/authRoutes';
-import { chatRoutes } from './interfaces/routes/chatRoutes';
-import { config } from "./shared/config";
-import { Server } from "socket.io";
-import { MongoDBConnection } from "./infrastructure/database/MongoDBConnection";
-import cors from "@fastify/cors";
+import { buildApp } from './main/app';
+import { buildSocketServer } from './main/socket';
 
-const fastify = Fastify({ logger: true});
+import { config } from './shared/config';
 
-// CORS
-fastify.register(cors, { 
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-    credentials: true
-})
+import { MongoDBConnection } from './infrastructure/database/MongoDBConnection'
 
-// Routes
-fastify.register(userRoutes, { prefix: '/api'})
-fastify.register(authRoutes, { prefix: '/api/auth'})
-fastify.register(chatRoutes, { prefix: '/api'})
+async function connectDatabase(): Promise<void> {
+    if(config.database.type === 'sqlite') {
+        const { SQLiteConnection } = await import('./infrastructure/database/SQLiteConnection')
 
-// Socket.io setup
-const httpServer = createServer(fastify.server);
-const io = new Server(httpServer, {
-    cors: {
-        origin: config.socket.corsOrigin,
-        methods: ['GET', 'POST']
+        SQLiteConnection.getInstance().connect();
+        return;
     }
-})
 
-// Socket events
-io.on('connection', (socket) => {
-    console.log("User connected: ", socket.id);
+    await MongoDBConnection.getInstance().connect();
+}
 
-    socket.on('join-room', (roomId: string) => {
-        socket.join(roomId);
-        console.log(`User ${socket.id} joined room ${roomId}`)
-    });
-
-    socket.on('send-message', (data) => {
-        socket.to(data.roomId).emit('receive-message', data);
-    })
-
-    socket.on('disconnect', () => {
-        console.log(`User disconnected: `, socket.id);
-    })
-})
-
-const start = async () => {
+async function start(): Promise<void> {
     try {
-        if(config.database.type === 'sqlite') {
-            const { SQLiteConnection } = await import('./infrastructure/database/SQLiteConnection');
-            SQLiteConnection.getInstance().connect();
-        } else {
-            await MongoDBConnection.getInstance().connect();
-        }
-        
-        await fastify.listen({ port: Number(config.server.port), host: '0.0.0.0'});
-        console.log(`Server running on port ${config.server.port}`)
-    } catch (err) {
-        fastify.log.error(err);
+        await connectDatabase();
+
+        const app = buildApp();
+
+        buildSocketServer(app.server);
+
+        await app.listen({
+            port: config.server.port,
+            host: '0.0.0.0',
+        })
+
+        app.log.info(`Server running on port ${config.server.port}`)
+    } catch (error) {
+        console.error('Failed to start application:', error);
         process.exit(1);
     }
 }
-
-start();
+void start();
