@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 
-import { JwtPayload, JwtUtils } from '../../shared/utils/jwt';
+import { JwtUtils } from '../../shared/utils/jwt';
 
 type SocketNext = (
     error?: ExtendedError,

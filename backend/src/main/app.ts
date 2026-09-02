@@ -20,7 +20,7 @@ export function buildApp(): FastifyInstance {
     });
 
     app.register(authRoutes, { 
-        prefix: 'api/auth',
+        prefix: '/api/auth',
     });
 
     app.register(chatRoutes, {

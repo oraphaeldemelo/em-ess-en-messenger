@@ -10,8 +10,7 @@ type NodeEnvironment =
 
 type DatabaseType =
   | 'sqlite'
-  | 'mongodb'
-  | 'postgres';
+  | 'mongodb';
 
 interface EnvironmentVariables {
   PORT: number;
@@ -19,7 +18,6 @@ interface EnvironmentVariables {
 
   DATABASE_TYPE: DatabaseType;
   MONGODB_URI: string;
-  //POSTGRES_URI: string;
 
   JWT_SECRET: string;
   JWT_EXPIRES_IN: string;
@@ -31,7 +29,7 @@ interface EnvironmentVariables {
 const envSchema = Joi.object<EnvironmentVariables>({
   PORT: Joi.number().port().default(3000),
   NODE_ENV: Joi.string().valid('development', 'test', 'production').default('development'),
-  DATABASE_TYPE: Joi.string().valid('sqlite', 'mongodb', 'postgres').default('sqlite'),
+  DATABASE_TYPE: Joi.string().valid('sqlite', 'mongodb').default('sqlite'),
   MONGODB_URI: Joi.string().default('mongodb://localhost:27017/em-ess-en-messenger'),
   JWT_SECRET: Joi.string().min(32).required(),
   JWT_EXPIRES_IN: Joi.string().default('24h'),
