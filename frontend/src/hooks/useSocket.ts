@@ -5,51 +5,77 @@ import { useEffect, useMemo } from "react";
 import { io, Socket } from "socket.io-client";
 
 export function useSocket(roomId?: string) {
-    const token = useAuthStore((s) => s.token);
-    const addMessage = useChatStore((s) => s.addMessage );
+
+    const token = useAuthStore((state) => state.token);
+    const addMessage = useChatStore((state) => state.addMessage );
 
     const socket: Socket | null = useMemo(() => {
         if(!token) return null;
+
         return io(import.meta.env.VITE_SOCKET_URL, {
             auth: { token },
-            transports: ['websocket'],
-            autoConnect: true,
+            transports: ["websocket"],
+            autoConnect: false,
         });
     }, [token]);
 
     useEffect(() => {
-        if(!socket) return;
-        
-        const handleReceiveMessage = (data: { roomId: string; message: Message }) => {
-            addMessage(data.roomId, data.message);
+        if (!socket) {
+          return;
+        }
+      
+        const handleConnect = () => {
+          console.log(
+            '[socket] connected:',
+            socket.id,
+          );
         };
+      
+        const handleConnectError = (error: Error & {
+          data?: unknown;
+        }) => {
+          console.error(
+            '[socket] connect_error:',
+            error.message,
+            error.data,
+          );
+        };
+      
+        socket.on('connect', handleConnect);
+      
+        socket.on('connect_error', handleConnectError);
+      
+        socket.connect();
+      
+        return () => {
+          socket.off( 'connect', handleConnect);
+      
+          socket.off('connect_error', handleConnectError);
+      
+          socket.disconnect();
+        };
+      }, [socket]);
 
+      useEffect(() => {
+        if(!socket || !roomId) return
+
+        const handleReceiveMessage = ( message: Message ) => {
+            addMessage(roomId, message);
+        }
+    
         socket.on("receive-message", handleReceiveMessage);
 
-        if(roomId) {
-            socket.emit('join-room', roomId);
-        }
-        
+        socket.emit("join-room", roomId);
+
         return () => {
-            socket.off('receive-message', handleReceiveMessage);
-            if(roomId) {
-                socket.emit('leave-room', roomId);
-            }
-        };
-    }, [socket, roomId]); // Removido addMessage das dependências
+            socket.off("receive-message", handleReceiveMessage)
+            socket.emit("leave-room", roomId);
+        }
+      }, [socket, roomId, addMessage])
 
     const sendMessage = (payload: { roomId: string; message: Message }) => {
         socket?.emit('send-message', payload);
     };
-
-    // Cleanup global quando o hook for desmontado
-    useEffect(() => {
-        return () => {
-            if (socket) {
-                socket.disconnect();
-            }
-        };
-    }, [socket]);
 
     return { socket, sendMessage };
 }

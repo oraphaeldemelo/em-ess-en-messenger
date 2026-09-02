@@ -30,12 +30,13 @@ interface EnvironmentVariables {
 
 const envSchema = Joi.object<EnvironmentVariables>({
   PORT: Joi.number().port().default(3000),
-  NODE_ENV: Joi.string().valid('development', 'test', 'production'),
-  DATABASE_TYPE: Joi.string().valid('sqlite', 'mongodb', 'postgres'),
+  NODE_ENV: Joi.string().valid('development', 'test', 'production').default('development'),
+  DATABASE_TYPE: Joi.string().valid('sqlite', 'mongodb', 'postgres').default('sqlite'),
   MONGODB_URI: Joi.string().default('mongodb://localhost:27017/em-ess-en-messenger'),
   JWT_SECRET: Joi.string().min(32).required(),
   JWT_EXPIRES_IN: Joi.string().default('24h'),
   CORS_ORIGIN: Joi.string().uri().default('http://localhost:5173'),
+  SOCKET_CORS_ORIGIN: Joi.string().uri().default('http://localhost:5173')
 }).unknown(true)
 
 const { value: env, error } = envSchema.validate(process.env, {

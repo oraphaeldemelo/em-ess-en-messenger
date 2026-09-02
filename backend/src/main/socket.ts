@@ -3,6 +3,8 @@ import { Server as HttpServer } from 'http';
 
 import { config } from '../shared/config';
 
+import { socketAuthMiddleware } from '@/interfaces/middlewares/socketAuthMiddleware';
+
 export function buildSocketServer(httpServer: HttpServer): Server {
     const io = new Server(httpServer, {
         cors: {
@@ -12,8 +14,10 @@ export function buildSocketServer(httpServer: HttpServer): Server {
         }
     })
 
+    io.use(socketAuthMiddleware);
+
     io.on('connection', (socket) => {
-        console.log(`Socket connected: ${socket.id}`);
+        console.log(`Socket connected: ${socket.id} - user: ${socket.data.user.userId}`);
 
         socket.on('join-room', (roomId: string) => {
             socket.join(roomId);
@@ -22,6 +26,10 @@ export function buildSocketServer(httpServer: HttpServer): Server {
         });
 
         socket.on('send-message', (data) => {
+            console.log(
+                `Socket ${socket.id} sent message to room ${data.roomId}`,
+                data,
+              );
             socket.to(data.roomId).emit('receive-message', data);
         });
 
