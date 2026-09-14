@@ -1,15 +1,19 @@
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
-import { Message } from "@/types";
 import { useEffect, useMemo } from "react";
 import { io, Socket } from "socket.io-client";
+import { ClientToServerEvents, ServerToClientEvents  } from "@/types/socketEvents";
+
+import type { SendMessagePayload, SocketMessage } from "@/types/socketEvents";
+
+type AppSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
 export function useSocket(roomId?: string) {
 
     const token = useAuthStore((state) => state.token);
     const addMessage = useChatStore((state) => state.addMessage );
 
-    const socket: Socket | null = useMemo(() => {
+    const socket: AppSocket | null = useMemo(() => {
         if(!token) return null;
 
         return io(import.meta.env.VITE_SOCKET_URL, {
@@ -59,21 +63,21 @@ export function useSocket(roomId?: string) {
       useEffect(() => {
         if(!socket || !roomId) return
 
-        const handleReceiveMessage = ( message: Message ) => {
+        const handleReceiveMessage = ( message: SocketMessage ) => {
             addMessage(roomId, message);
         }
     
         socket.on("receive-message", handleReceiveMessage);
 
-        socket.emit("join-room", roomId);
+        socket.emit("join-room", { roomId });
 
         return () => {
             socket.off("receive-message", handleReceiveMessage)
-            socket.emit("leave-room", roomId);
+            socket.emit("leave-room", { roomId });
         }
       }, [socket, roomId, addMessage])
 
-    const sendMessage = (payload: { roomId: string; message: Message }) => {
+    const sendMessage = (payload: SendMessagePayload) => {
         socket?.emit('send-message', payload);
     };
 

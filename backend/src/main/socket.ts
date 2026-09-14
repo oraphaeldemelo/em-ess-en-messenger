@@ -4,9 +4,18 @@ import { Server as HttpServer } from 'http';
 import { config } from '../shared/config';
 
 import { socketAuthMiddleware } from '@/interfaces/middlewares/socketAuthMiddleware';
+import { ClientToServerEvents, ServerToClientEvents } from '@/types/socketEvents';
+import { joinRoomSchema, leaveRoomSchema, sendMessageSchema } from '@/interfaces/socket/socketSchemas';
+import { validateSocketPayload } from '@/interfaces/socket/validateSocketPayload';
+
+import type {
+    JoinRoomPayload,
+    LeaveRoomPayload,
+    SendMessagePayload
+} from '../types/socketEvents'
 
 export function buildSocketServer(httpServer: HttpServer): Server {
-    const io = new Server(httpServer, {
+    const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
         cors: {
             origin: config.socket.corsOrigin,
             methods: [ 'GET', 'POST'],
@@ -19,24 +28,40 @@ export function buildSocketServer(httpServer: HttpServer): Server {
     io.on('connection', (socket) => {
         console.log(`Socket connected: ${socket.id} - user: ${socket.data.user.userId}`);
 
-        socket.on('join-room', (roomId: string) => {
-            socket.join(roomId);
+        socket.on('join-room', (receivedPayload) => {
+            const payload = validateSocketPayload<JoinRoomPayload>(
+                joinRoomSchema,
+                receivedPayload
+            )
 
-            console.log(`Socket ${socket.id} joined room ${roomId}`)
+            if(!payload) return
+
+            socket.join(payload.roomId);
+
+            console.log(`Socket ${socket.id} joined room ${payload.roomId}`)
         });
 
-        socket.on('send-message', (data) => {
-            console.log(
-                `Socket ${socket.id} sent message to room ${data.roomId}`,
-                data,
-              );
-            socket.to(data.roomId).emit('receive-message', data);
+        socket.on('send-message', (receivedPayload) => {
+            const payload = validateSocketPayload<SendMessagePayload>(
+                sendMessageSchema,
+                receivedPayload
+            )
+            if(!payload) return;
+
+            console.log(`Socket ${socket.id} sent message to room ${payload.roomId}`);
+            socket.to(payload.roomId).emit('receive-message', payload.message);
         });
 
-        socket.on('leave-room', (roomId: string) => {
-            socket.leave(roomId);
+        socket.on('leave-room', (receivedPayload) => {
+            const payload = validateSocketPayload<LeaveRoomPayload> (
+                leaveRoomSchema, receivedPayload
+            )
 
-            console.log(`Socket ${socket.id} left room ${roomId}`);
+            if(!payload) return;
+
+            socket.leave(payload.roomId);
+
+            console.log(`Socket ${socket.id} left room ${payload.roomId}`);
         })
 
         socket.on('disconnect', (reason) => {

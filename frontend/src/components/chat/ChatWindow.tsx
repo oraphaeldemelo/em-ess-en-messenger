@@ -53,7 +53,7 @@ export default function ChatWindow({
         // Opcional: enviar para a API para persistir no banco
         // const saved = await chatService.sendMessage(conversationId, content);
 
-        const saved = { id: crypto.randomUUID(), conversationId, senderId: 'me', content, createdAt: new Date()};
+        const saved = { id: crypto.randomUUID(), conversationId, senderId: 'me', content, createdAt: new Date().toISOString()};
         addMessage(conversationId, saved);
         sendMessage({ roomId: conversationId, message: saved});
     }, [addMessage, conversationId, sendMessage])
