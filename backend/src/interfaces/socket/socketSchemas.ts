@@ -10,7 +10,7 @@ export const leaveRoomSchema = Joi.object({
 
 const socketMessageSchema = Joi.object({
     id: Joi.string().required(),
-    conversationId: Joi.string(),
+    conversationId: Joi.string().required(),
     senderId: Joi.string().required(),
     content: Joi.string().max(4096).required(),
     createdAt: Joi.string().isoDate().required(),
