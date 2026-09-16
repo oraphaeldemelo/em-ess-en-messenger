@@ -68,11 +68,10 @@ export class SQLiteConnection {
     }
 
     disconnect(): void {
-        if(this.db) {
-            this.db.close();
-            this.db = null;
-            console.log('SQLite desconectado')
-        }
+        if(!this.db) return
+        this.db.close();
+        this.db = null;
+        console.log('SQLite connection closed')
     }
 
     clearData(): void {

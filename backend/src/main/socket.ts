@@ -16,7 +16,9 @@ import type {
     SendMessagePayload
 } from '../types/socketEvents'
 
-export function buildSocketServer(httpServer: HttpServer): Server {
+export type AppSocketServer = Server<ClientToServerEvents, ServerToClientEvents>;
+
+export function buildSocketServer(httpServer: HttpServer): AppSocketServer {
     const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
         cors: {
             origin: config.socket.corsOrigin,

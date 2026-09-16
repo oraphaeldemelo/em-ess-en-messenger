@@ -37,5 +37,6 @@ export class MongoDBConnection {
 
     async disconnect(): Promise<void> {
         await this.client.close();
+        console.log('MongoDB connection closed')
     }
 }
