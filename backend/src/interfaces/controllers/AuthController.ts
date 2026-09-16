@@ -10,21 +10,13 @@ export class AuthController {
     ) {}
 
     async register(req: FastifyRequest<{ Body: CreateUserDTO}>, reply: FastifyReply) {
-        try {
-            const result = await this.registerUserUseCase.execute(req.body);
-            return reply.status(201).send(result);
-        } catch (error: any) {
-            return reply.status(400).send({ error: error.message })
-        }
+        const result = await this.registerUserUseCase.execute(req.body);
+        return reply.status(201).send(result);
     }
 
     async login(request: FastifyRequest<{ Body: LoginUserDTO }>, reply: FastifyReply) {
-        try {
-            const result = await this.loginUserUseCase.execute(request.body);
-            return reply.status(200).send(result);
-        } catch (error: any) {
-            return reply.status(401).send({ error: error.message })
-        }
+        const result = await this.loginUserUseCase.execute(request.body);
+        return reply.status(200).send(result);
     }
 
 }

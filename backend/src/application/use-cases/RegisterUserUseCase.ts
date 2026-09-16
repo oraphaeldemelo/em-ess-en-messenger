@@ -4,6 +4,7 @@ import { IUser, User } from "@/domain/entities/User";
 import { PasswordUtils } from "@/shared/utils/password";
 import { randomUUID } from "crypto";
 import { JwtUtils } from "@/shared/utils/jwt";
+import { AppError } from "@/shared/errors/AppError";
 
 export class RegisterUserUseCase {
     constructor(private userRepository: IUserRepository) {}
@@ -12,11 +13,13 @@ export class RegisterUserUseCase {
         const existingUser = await this.userRepository.findByEmail(data.email);
 
         if(existingUser) { 
-            throw new Error("User already exists with this email");
+            throw new AppError('EMAIL_ALREADY_IN_USE', "User already exists with this email", 409);
         }
+
         const existingUsername = await this.userRepository.findByUsername(data.username);
+
         if(existingUsername) {
-            throw new Error("User already exists with this username");
+            throw new AppError('USERNAME_ALREADY_IN_USE', "User already exists with this username", 409);
         }
 
         const hashedPassword = await PasswordUtils.hash(data.password);
@@ -29,7 +32,7 @@ export class RegisterUserUseCase {
         )
 
         if(!user.isValid()) {
-            throw new Error("Invalid user data");
+            throw new AppError('INVALID_USER_DATA', "Invalid user data", 400);
         }
 
         const createdUser = await this.userRepository.create(user);

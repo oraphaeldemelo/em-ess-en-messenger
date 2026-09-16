@@ -8,6 +8,8 @@ import { ClientToServerEvents, ServerToClientEvents } from '@/types/socketEvents
 import { joinRoomSchema, leaveRoomSchema, sendMessageSchema } from '@/interfaces/socket/socketSchemas';
 import { validateSocketPayload } from '@/interfaces/socket/validateSocketPayload';
 
+import { emitSocketError } from '@/interfaces/socket/emitSocketError';
+
 import type {
     JoinRoomPayload,
     LeaveRoomPayload,
@@ -34,7 +36,16 @@ export function buildSocketServer(httpServer: HttpServer): Server {
                 receivedPayload
             )
 
-            if(!payload) return
+            if(!payload) {
+                emitSocketError(
+                    socket,
+                    { 
+                        code: 'INVALID_PAYLOAD',
+                        message: 'Invalid join-room payload',
+                    }
+                )
+                return;
+            }
 
             socket.join(payload.roomId);
 
@@ -46,7 +57,16 @@ export function buildSocketServer(httpServer: HttpServer): Server {
                 sendMessageSchema,
                 receivedPayload
             )
-            if(!payload) return;
+            if(!payload) {
+                emitSocketError(
+                    socket,
+                    {
+                        code: 'INVALID_PAYLOAD',
+                        message: 'Invalid send-message payload',
+                    }
+                );
+                return;
+            };
 
             console.log(`Socket ${socket.id} sent message to room ${payload.roomId}`);
             socket.to(payload.roomId).emit('receive-message', payload.message);
@@ -57,7 +77,16 @@ export function buildSocketServer(httpServer: HttpServer): Server {
                 leaveRoomSchema, receivedPayload
             )
 
-            if(!payload) return;
+            if(!payload) {
+                emitSocketError(
+                    socket,
+                    {
+                        code: 'INVALID_PAYLOAD',
+                        message: 'Invalid leave-room payload',
+                    }
+                );
+                return;
+            };
 
             socket.leave(payload.roomId);
 

@@ -6,6 +6,11 @@ export interface SocketMessage {
     createdAt: string;
 }
 
+export interface SocketErrorPayload {
+    code: string;
+    message: string;
+}
+
 export interface JoinRoomPayload {
     roomId: string;
 }
@@ -36,5 +41,9 @@ export interface ClientToServerEvents {
 export interface ServerToClientEvents {
     'receive-message': (
         message: SocketMessage,
+    ) => void;
+
+    'socket-error': (
+        error: SocketErrorPayload,
     ) => void;
 }

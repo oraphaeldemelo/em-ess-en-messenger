@@ -2,7 +2,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import { useEffect, useMemo } from "react";
 import { io, Socket } from "socket.io-client";
-import { ClientToServerEvents, ServerToClientEvents  } from "@/types/socketEvents";
+import { SocketErrorPayload, ClientToServerEvents, ServerToClientEvents  } from "@/types/socketEvents";
 
 import type { SendMessagePayload, SocketMessage } from "@/types/socketEvents";
 
@@ -44,10 +44,20 @@ export function useSocket(roomId?: string) {
             error.data,
           );
         };
+
+        const handleSocketError = (error: SocketErrorPayload) => {
+          console.error(
+            '[socket] application error: ',
+            error.code,
+            error.message
+          )
+        }
       
         socket.on('connect', handleConnect);
       
         socket.on('connect_error', handleConnectError);
+
+        socket.on('socket-error', handleSocketError);
       
         socket.connect();
       
@@ -55,6 +65,8 @@ export function useSocket(roomId?: string) {
           socket.off( 'connect', handleConnect);
       
           socket.off('connect_error', handleConnectError);
+
+          socket.off('socket-error', handleSocketError);
       
           socket.disconnect();
         };

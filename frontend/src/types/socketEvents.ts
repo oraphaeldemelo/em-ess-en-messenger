@@ -37,4 +37,13 @@ export interface ServerToClientEvents {
     'receive-message': (
         message: SocketMessage,
     ) => void;
+
+    'socket-error': (
+        error: SocketErrorPayload,
+    ) => void;
+}
+
+export interface SocketErrorPayload {
+    code: string;
+    message: string;
 }
