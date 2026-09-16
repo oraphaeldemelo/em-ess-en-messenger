@@ -2,6 +2,14 @@ import { IUserRepository } from "@/domain/repositories/IUserRepository";
 import { SQLiteConnection } from "../../SQLiteConnection";
 import { User } from "@/domain/entities/User";
 
+interface SQLiteUserRow {
+    id: string;
+    username: string;
+    email: string;
+    password: string;
+    created_at: string;
+    updated_at: string;
+}
 export class SQLiteUserRepository implements IUserRepository {
     private db = SQLiteConnection.getInstance().getDatabase();
 
@@ -20,14 +28,14 @@ export class SQLiteUserRepository implements IUserRepository {
     async findById(id: string): Promise<User | null> {
         const stmt = this.db.prepare(`SELECT * FROM users WHERE id = ?`);
 
-        const row = stmt.get(id) as any;
+        const row = stmt.get(id) as SQLiteUserRow | undefined;
 
         return row ? this.mapRowToUser(row) : null;
     }
 
     async findByEmail(email: string) : Promise<User | null> {
         const stmt = this.db.prepare(`SELECT * from users WHERE email = ?`);
-        const row = stmt.get(email) as any; // as User[]
+        const row = stmt.get(email) as SQLiteUserRow | undefined;
 
         return row ? this.mapRowToUser(row) : null;
     }
@@ -35,7 +43,7 @@ export class SQLiteUserRepository implements IUserRepository {
     async findByUsername(username: string): Promise<User | null> {
         const stmt = this.db.prepare(`SELECT * FROM users WHERE username = ?`);
 
-        const row = stmt.get(username) as any; // as User[]
+        const row = stmt.get(username) as SQLiteUserRow | undefined;
 
         return row ? this.mapRowToUser(row) : null;
     }
@@ -54,7 +62,7 @@ export class SQLiteUserRepository implements IUserRepository {
             userdata.username ?? current.username, 
             userdata.email ?? current.email, 
             userdata.password ?? current.password, 
-            new Date().toISOString, 
+            new Date().toISOString(), 
             id
         );
 
@@ -69,11 +77,11 @@ export class SQLiteUserRepository implements IUserRepository {
 
     async findAll(): Promise<User[]> {
         const stmt = this.db.prepare('SELECT * FROM users ORDER BY created_at');
-        const rows = stmt.all() as any[] // as User[]
+        const rows = stmt.all() as SQLiteUserRow[];
         return rows.map(row => this.mapRowToUser(row));
     }
 
-    private mapRowToUser(row: any): User {
+    private mapRowToUser(row: SQLiteUserRow): User {
         return new User(
             row.id,
             row.username,

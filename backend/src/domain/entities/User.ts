@@ -30,6 +30,8 @@ export class User implements IUser {
     }
 
     toPublicJSON(): Omit<IUser, 'password'> {
+        //Password is intentionally ommited from public data.
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, ...publicData } = this;
         return publicData;
     }

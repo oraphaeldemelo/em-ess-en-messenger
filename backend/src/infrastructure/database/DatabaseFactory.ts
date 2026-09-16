@@ -4,7 +4,7 @@ import { SQLiteUserRepository } from "./repositories/SQLite/SQLiteUserRepository
 import { MongoUserRepository } from "./repositories/MongoDB/MongoUserRepository";
 import { config } from "@/shared/config";
 import { SQLiteMessageRepository } from "./repositories/SQLite/SQLiteMessageRepository";
-
+import { SQLiteConnection } from './SQLiteConnection';
 export class DatabaseFactory {
     private static userRepository: IUserRepository | null = null;
     private static messageRepository: IMessageRepository | null = null;
@@ -46,7 +46,6 @@ export class DatabaseFactory {
     }
 
     static clearData(): void {
-        const { SQLiteConnection } = require('./SQLiteConnection');
         SQLiteConnection.getInstance().clearData();
         
     }

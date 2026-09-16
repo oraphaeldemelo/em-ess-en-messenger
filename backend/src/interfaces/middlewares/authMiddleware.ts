@@ -20,7 +20,7 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
         const payload = JwtUtils.verify(token);
 
         (request as AuthenticatedRequest).user = payload
-    } catch (error) {
+    } catch {
         return reply.status(401).send({ error: 'Invalid token'})
     }
 }

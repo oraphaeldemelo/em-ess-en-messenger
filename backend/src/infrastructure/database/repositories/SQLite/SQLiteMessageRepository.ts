@@ -2,6 +2,15 @@ import { IMessageRepository } from "@/domain/repositories/IMessageRepository";
 import { SQLiteConnection } from "../../SQLiteConnection";
 import { Message } from "@/domain/entities/Message";
 
+
+interface SQLiteMessageRow {
+    id: string;
+    content: string;
+    sender_id: string;
+    receiver_id: string;
+    created_at: string;
+    updated_at: string;
+}
 export class SQLiteMessageRepository implements IMessageRepository {
     private db = SQLiteConnection.getInstance().getDatabase();
 
@@ -26,7 +35,7 @@ export class SQLiteMessageRepository implements IMessageRepository {
     async findById(id: string): Promise<Message | null> {
         const stmt = this.db.prepare('SELECT * FROM messages WHERE id = ?');
 
-        const row = stmt.get(id) as any;
+        const row = stmt.get(id) as SQLiteMessageRow | undefined;
 
         return row ? this.mapRowToMessage(row) : null;
     }
@@ -34,14 +43,14 @@ export class SQLiteMessageRepository implements IMessageRepository {
     async findBySenderId(senderId: string): Promise<Message[]> {
         const stmt = this.db.prepare('SELECT * FROM messages WHERE sender_id = ? ORDER BY created_at ASC');
 
-        const rows = stmt.all(senderId) as any[]; // as Message[]
+        const rows = stmt.all(senderId) as SQLiteMessageRow[]
         return rows?.map(row => this.mapRowToMessage(row));
     }
 
     async findByReceiverId(receiverId: string): Promise<Message[]> {
         const stmt = this.db.prepare('SELECT * FROM messages WHERE receiver_id = ? ORDER BY created_at ASC');
 
-        const rows = stmt.all(receiverId) as any[];
+        const rows = stmt.all(receiverId) as SQLiteMessageRow[];
         return rows.map(row => this.mapRowToMessage(row));
     }
 
@@ -53,7 +62,7 @@ export class SQLiteMessageRepository implements IMessageRepository {
             ORDER BY created_at ASC    
         `)
 
-        const rows = stmt.all(userId1, userId2, userId2, userId1) as any[];
+        const rows = stmt.all(userId1, userId2, userId2, userId1) as SQLiteMessageRow[];
         return rows.map(row => this.mapRowToMessage(row));
     }
     
@@ -81,7 +90,7 @@ export class SQLiteMessageRepository implements IMessageRepository {
         return result.changes > 0;
     }
 
-    private mapRowToMessage(row: any): Message {
+    private mapRowToMessage(row: SQLiteMessageRow): Message {
         return new Message(
             row.id,
             row.content,
