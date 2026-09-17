@@ -8,8 +8,6 @@ import { SQLiteConnection } from './infrastructure/database/SQLiteConnection';
 
 async function connectDatabase(): Promise<void> {
     if (config.database.type === 'sqlite') {
-        const { SQLiteConnection } = await import('./infrastructure/database/SQLiteConnection');
-
         SQLiteConnection.getInstance().connect();
         return;
     }
