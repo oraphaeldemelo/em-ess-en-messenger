@@ -1,34 +1,34 @@
-import { IUserRepository } from "@/domain/repositories/IUserRepository";
-import { LoginUserDTO } from "../dto/CreateUserDTO";
-import { IUser } from "@/domain/entities/User";
-import { PasswordUtils } from "@/shared/utils/password";
-import { JwtUtils } from "@/shared/utils/jwt";
-import { AppError } from "@/shared/errors/AppError";
+import { IUserRepository } from '@/domain/repositories/IUserRepository';
+import { LoginUserDTO } from '../dto/CreateUserDTO';
+import { IUser } from '@/domain/entities/User';
+import { PasswordUtils } from '@/shared/utils/password';
+import { JwtUtils } from '@/shared/utils/jwt';
+import { AppError } from '@/shared/errors/AppError';
 
 export class LoginUserUseCase {
     constructor(private userRepository: IUserRepository) {}
 
-    async execute(data: LoginUserDTO): Promise<{ user: Omit<IUser, 'password'> ; token: string}> {
+    async execute(data: LoginUserDTO): Promise<{ user: Omit<IUser, 'password'>; token: string }> {
         const user = await this.userRepository.findByEmail(data.email);
 
-        if(!user) {
+        if (!user) {
             throw new AppError('INVALID_CREDENTIALS', 'Email or password incorrect', 401);
         }
 
         const isPasswordValid = await PasswordUtils.compare(data.password, user.password);
 
-        if(!isPasswordValid) {
+        if (!isPasswordValid) {
             throw new AppError('INVALID_CREDENTIALS', 'Email or password incorrect', 401);
         }
-        
+
         const token = JwtUtils.generate({
             userId: user.id,
             email: user.email,
-        })
+        });
 
-        return { 
+        return {
             user: user.toPublicJSON(),
-            token
-        }
+            token,
+        };
     }
 }

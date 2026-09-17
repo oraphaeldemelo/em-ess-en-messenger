@@ -1,10 +1,10 @@
-import { RegisterUserUseCase } from "@/application/use-cases/RegisterUserUseCase";
-import { DatabaseFactory } from "@/infrastructure/database/DatabaseFactory";
-import { FastifyInstance } from "fastify";
-import { AuthController } from "../controllers/AuthController";
-import { LoginUserUseCase } from "@/application/use-cases/LoginUserUseCase";
+import { RegisterUserUseCase } from '@/application/use-cases/RegisterUserUseCase';
+import { DatabaseFactory } from '@/infrastructure/database/DatabaseFactory';
+import { FastifyInstance } from 'fastify';
+import { AuthController } from '../controllers/AuthController';
+import { LoginUserUseCase } from '@/application/use-cases/LoginUserUseCase';
 
-export async function authRoutes(fastify: FastifyInstance){
+export async function authRoutes(fastify: FastifyInstance) {
     const userRepository = DatabaseFactory.getUserRepository();
 
     const registerUserUseCase = new RegisterUserUseCase(userRepository);

@@ -1,5 +1,5 @@
-import { Db, MongoClient } from "mongodb";
-import { config } from "@/shared/config";
+import { Db, MongoClient } from 'mongodb';
+import { config } from '@/shared/config';
 
 export class MongoDBConnection {
     private static instance: MongoDBConnection;
@@ -11,7 +11,7 @@ export class MongoDBConnection {
     }
 
     static getInstance(): MongoDBConnection {
-        if(!MongoDBConnection.instance) {
+        if (!MongoDBConnection.instance) {
             MongoDBConnection.instance = new MongoDBConnection();
         }
         return MongoDBConnection.instance;
@@ -21,22 +21,22 @@ export class MongoDBConnection {
         try {
             await this.client.connect();
             this.db = this.client.db();
-            console.log("Connected to MongoDB");
+            console.log('Connected to MongoDB');
         } catch (error) {
-            console.error("MongoDB connection error: ", error);
+            console.error('MongoDB connection error: ', error);
             throw error;
         }
     }
 
     getDatabase(): Db {
-        if(!this.db) {
-            throw new Error("Database not connected");
+        if (!this.db) {
+            throw new Error('Database not connected');
         }
         return this.db;
     }
 
     async disconnect(): Promise<void> {
         await this.client.close();
-        console.log('MongoDB connection closed')
+        console.log('MongoDB connection closed');
     }
 }

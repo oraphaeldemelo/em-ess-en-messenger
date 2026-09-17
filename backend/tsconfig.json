@@ -19,7 +19,7 @@
         "strictFunctionTypes": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
-        "moduleResolution": "node", 
+        "moduleResolution": "node",
         "baseUrl": "./src",
         "paths": {
             "@/*": ["*"],
@@ -27,9 +27,9 @@
             "@/application/*": ["application/*"],
             "@/infrastructure/*": ["infrastructure/*"],
             "@/interfaces/*": ["interfaces/*"],
-            "@/shared/*": ["shared/*"],
+            "@/shared/*": ["shared/*"]
         }
     },
     "include": ["src/**/*"],
-    "exclude": ["node_modules", "dist", "**/*.test.ts"],
+    "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

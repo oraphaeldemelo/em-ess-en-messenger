@@ -1,6 +1,6 @@
-import { IUserRepository } from "@/domain/repositories/IUserRepository";
-import { SQLiteConnection } from "../../SQLiteConnection";
-import { User } from "@/domain/entities/User";
+import { IUserRepository } from '@/domain/repositories/IUserRepository';
+import { SQLiteConnection } from '../../SQLiteConnection';
+import { User } from '@/domain/entities/User';
 
 interface SQLiteUserRow {
     id: string;
@@ -20,7 +20,12 @@ export class SQLiteUserRepository implements IUserRepository {
         `);
 
         stmt.run(
-            user.id, user.username, user.email, user.password, user.createdAt.toISOString(), user.updatedAt.toISOString()
+            user.id,
+            user.username,
+            user.email,
+            user.password,
+            user.createdAt.toISOString(),
+            user.updatedAt.toISOString(),
         );
         return user;
     }
@@ -33,7 +38,7 @@ export class SQLiteUserRepository implements IUserRepository {
         return row ? this.mapRowToUser(row) : null;
     }
 
-    async findByEmail(email: string) : Promise<User | null> {
+    async findByEmail(email: string): Promise<User | null> {
         const stmt = this.db.prepare(`SELECT * from users WHERE email = ?`);
         const row = stmt.get(email) as SQLiteUserRow | undefined;
 
@@ -56,14 +61,14 @@ export class SQLiteUserRepository implements IUserRepository {
             UPDATE users 
             SET username = ?, email = ?, password = ?, updated_at = ?
             WHERE id = ?
-        `)
+        `);
 
         stmt.run(
-            userdata.username ?? current.username, 
-            userdata.email ?? current.email, 
-            userdata.password ?? current.password, 
-            new Date().toISOString(), 
-            id
+            userdata.username ?? current.username,
+            userdata.email ?? current.email,
+            userdata.password ?? current.password,
+            new Date().toISOString(),
+            id,
         );
 
         return this.findById(id);
@@ -78,7 +83,7 @@ export class SQLiteUserRepository implements IUserRepository {
     async findAll(): Promise<User[]> {
         const stmt = this.db.prepare('SELECT * FROM users ORDER BY created_at');
         const rows = stmt.all() as SQLiteUserRow[];
-        return rows.map(row => this.mapRowToUser(row));
+        return rows.map((row) => this.mapRowToUser(row));
     }
 
     private mapRowToUser(row: SQLiteUserRow): User {
@@ -88,7 +93,7 @@ export class SQLiteUserRepository implements IUserRepository {
             row.email,
             row.password,
             new Date(row.created_at),
-            new Date(row.updated_at)
-        )
+            new Date(row.updated_at),
+        );
     }
 }

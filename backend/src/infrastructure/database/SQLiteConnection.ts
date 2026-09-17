@@ -1,4 +1,4 @@
-import Database from "better-sqlite3";
+import Database from 'better-sqlite3';
 
 export class SQLiteConnection {
     private static instance: SQLiteConnection;
@@ -7,7 +7,7 @@ export class SQLiteConnection {
     private constructor() {}
 
     static getInstance(): SQLiteConnection {
-        if(!SQLiteConnection.instance) {
+        if (!SQLiteConnection.instance) {
             SQLiteConnection.instance = new SQLiteConnection();
         }
         return SQLiteConnection.instance;
@@ -25,7 +25,7 @@ export class SQLiteConnection {
     }
 
     getDatabase(): Database.Database {
-        if(!this.db){
+        if (!this.db) {
             throw new Error('SQLite não está conectado');
         }
         return this.db;
@@ -43,7 +43,7 @@ export class SQLiteConnection {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
-        `)
+        `);
 
         this.db.exec(`
             CREATE TABLE IF NOT EXISTS messages (
@@ -56,22 +56,22 @@ export class SQLiteConnection {
                 FOREIGN KEY (sender_id) REFERENCES users (id),
                 FOREIGN KEY (receiver_id) REFERENCES users(id)
             )    
-        `)
+        `);
 
         this.db.exec(`
             CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages (sender_id);
             CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages (receiver_id);
             CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages (sender_id, receiver_id);    
-        `)
+        `);
 
         console.log('✅ Tabelas SQLite criadas');
     }
 
     disconnect(): void {
-        if(!this.db) return
+        if (!this.db) return;
         this.db.close();
         this.db = null;
-        console.log('SQLite connection closed')
+        console.log('SQLite connection closed');
     }
 
     clearData(): void {

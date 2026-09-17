@@ -1,18 +1,30 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 export class ChatController {
-
     constructor() {}
 
-    async listConversations(request: FastifyRequest, reply: FastifyReply){
+    async listConversations(request: FastifyRequest, reply: FastifyReply) {
         const mockConversations = [
             {
-                id: '1', 
+                id: '1',
                 title: 'Conversa com João',
                 participants: [
-                    { id: '1', username: 'João', email: 'joao@email.com', status: 'online', createdAt: new Date(), updatedAt: new Date()},
-                    { id: '2', username: 'Maria', email: 'maria@email.com', status: 'online', createdAt: new Date(), updatedAt: new Date()}
+                    {
+                        id: '1',
+                        username: 'João',
+                        email: 'joao@email.com',
+                        status: 'online',
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                    {
+                        id: '2',
+                        username: 'Maria',
+                        email: 'maria@email.com',
+                        status: 'online',
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
                 ],
                 lastMessage: {
                     id: '1',
@@ -22,14 +34,27 @@ export class ChatController {
                     createdAt: new Date(),
                 },
                 updatedAt: new Date(),
-
             },
             {
-                id: '2', 
+                id: '2',
                 title: 'Grupo de estudos',
                 participants: [
-                    { id: '1', username: 'João', email: 'joao@email.com', status: 'online', createdAt: new Date(), updatedAt: new Date()},
-                    { id: '3', username: 'Pedro', email: 'pedro@email.com', status: 'away', createdAt: new Date(), updatedAt: new Date()}
+                    {
+                        id: '1',
+                        username: 'João',
+                        email: 'joao@email.com',
+                        status: 'online',
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                    {
+                        id: '3',
+                        username: 'Pedro',
+                        email: 'pedro@email.com',
+                        status: 'away',
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
                 ],
                 lastMessage: {
                     id: '2',
@@ -39,14 +64,16 @@ export class ChatController {
                     createdAt: new Date(),
                 },
                 updatedAt: new Date(),
-
-            }
-        ]
+            },
+        ];
 
         return reply.code(200).send(mockConversations);
     }
 
-    async listMessages(request: FastifyRequest<{ Params: { conversationId: string }}>, reply: FastifyReply) {
+    async listMessages(
+        request: FastifyRequest<{ Params: { conversationId: string } }>,
+        reply: FastifyReply,
+    ) {
         const { conversationId } = request.params;
 
         const mockMessages = [
@@ -70,22 +97,25 @@ export class ChatController {
                 senderId: '1',
                 content: 'Estou bem também, que bom falar com você',
                 createdAt: new Date('2024-01-10T10:01:00Z'),
-            }
-        ]
+            },
+        ];
         return reply.code(200).send(mockMessages);
     }
-    
-    async sendMessage(request: FastifyRequest<{Params:  {conversationId: string}, Body: { content: string}}>, reply: FastifyReply) {
+
+    async sendMessage(
+        request: FastifyRequest<{ Params: { conversationId: string }; Body: { content: string } }>,
+        reply: FastifyReply,
+    ) {
         const { conversationId } = request.params;
         const { content } = request.body;
 
         const newMessage = {
             id: Date.now().toString(),
             conversationId,
-            senderid: '1',  // TODO: Pegar do token JWT
+            senderid: '1', // TODO: Pegar do token JWT
             content,
             createdAt: new Date(),
-        }
+        };
 
         return reply.code(201).send(newMessage);
     }

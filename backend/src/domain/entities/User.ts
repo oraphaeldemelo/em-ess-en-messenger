@@ -8,8 +8,7 @@ export interface IUser {
 }
 
 export class User implements IUser {
-
-    constructor(       
+    constructor(
         public id: string,
         public username: string,
         public email: string,
@@ -23,9 +22,9 @@ export class User implements IUser {
     }
 
     update(data: Partial<Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>>): void {
-        if(data.username) this.username = data.username;
-        if(data.email) this.email = data.email;
-        if(data.password) this.password = data.password;
+        if (data.username) this.username = data.username;
+        if (data.email) this.email = data.email;
+        if (data.password) this.password = data.password;
         this.updatedAt = new Date();
     }
 

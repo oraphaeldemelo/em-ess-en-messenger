@@ -1,7 +1,6 @@
-import { IMessageRepository } from "@/domain/repositories/IMessageRepository";
-import { SQLiteConnection } from "../../SQLiteConnection";
-import { Message } from "@/domain/entities/Message";
-
+import { IMessageRepository } from '@/domain/repositories/IMessageRepository';
+import { SQLiteConnection } from '../../SQLiteConnection';
+import { Message } from '@/domain/entities/Message';
 
 interface SQLiteMessageRow {
     id: string;
@@ -26,8 +25,8 @@ export class SQLiteMessageRepository implements IMessageRepository {
             message.senderId,
             message.receiverId,
             message.createdAt.toISOString(),
-            message.updatedAt.toISOString()
-        )
+            message.updatedAt.toISOString(),
+        );
 
         return message;
     }
@@ -41,17 +40,21 @@ export class SQLiteMessageRepository implements IMessageRepository {
     }
 
     async findBySenderId(senderId: string): Promise<Message[]> {
-        const stmt = this.db.prepare('SELECT * FROM messages WHERE sender_id = ? ORDER BY created_at ASC');
+        const stmt = this.db.prepare(
+            'SELECT * FROM messages WHERE sender_id = ? ORDER BY created_at ASC',
+        );
 
-        const rows = stmt.all(senderId) as SQLiteMessageRow[]
-        return rows?.map(row => this.mapRowToMessage(row));
+        const rows = stmt.all(senderId) as SQLiteMessageRow[];
+        return rows?.map((row) => this.mapRowToMessage(row));
     }
 
     async findByReceiverId(receiverId: string): Promise<Message[]> {
-        const stmt = this.db.prepare('SELECT * FROM messages WHERE receiver_id = ? ORDER BY created_at ASC');
+        const stmt = this.db.prepare(
+            'SELECT * FROM messages WHERE receiver_id = ? ORDER BY created_at ASC',
+        );
 
         const rows = stmt.all(receiverId) as SQLiteMessageRow[];
-        return rows.map(row => this.mapRowToMessage(row));
+        return rows.map((row) => this.mapRowToMessage(row));
     }
 
     async findConversation(userId1: string, userId2: string): Promise<Message[]> {
@@ -60,27 +63,23 @@ export class SQLiteMessageRepository implements IMessageRepository {
             WHERE (sender_id = ? AND receiver_id = ?)
             OR (sender_id = ? AND receiver_id = ?)
             ORDER BY created_at ASC    
-        `)
+        `);
 
         const rows = stmt.all(userId1, userId2, userId2, userId1) as SQLiteMessageRow[];
-        return rows.map(row => this.mapRowToMessage(row));
+        return rows.map((row) => this.mapRowToMessage(row));
     }
-    
+
     async update(id: string, messageData: Partial<Message>): Promise<Message | null> {
         const current = await this.findById(id);
-        if(!current) return null;
+        if (!current) return null;
 
         const stmt = this.db.prepare(`
             UPDATE messages 
             SET content = ?, updated_at = ?
             WHERE id = ?    
-        `)
-        
-        stmt.run(
-            messageData.content ?? current.content,
-            new Date().toISOString(),
-            id
-        )
+        `);
+
+        stmt.run(messageData.content ?? current.content, new Date().toISOString(), id);
         return this.findById(id);
     }
 
@@ -97,7 +96,7 @@ export class SQLiteMessageRepository implements IMessageRepository {
             row.sender_id,
             row.receiver_id,
             new Date(row.created_at),
-            new Date(row.updated_at)
-        )
+            new Date(row.updated_at),
+        );
     }
 }

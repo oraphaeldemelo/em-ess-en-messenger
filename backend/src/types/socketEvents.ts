@@ -25,25 +25,15 @@ export interface SendMessagePayload {
 }
 
 export interface ClientToServerEvents {
-    'join-room': (
-        payload: JoinRoomPayload
-    ) => void;
+    'join-room': (payload: JoinRoomPayload) => void;
 
-    'leave-room': (
-        payload: LeaveRoomPayload
-    ) => void;
+    'leave-room': (payload: LeaveRoomPayload) => void;
 
-    'send-message': (
-        payload: SendMessagePayload
-    ) => void;
+    'send-message': (payload: SendMessagePayload) => void;
 }
 
 export interface ServerToClientEvents {
-    'receive-message': (
-        message: SocketMessage,
-    ) => void;
+    'receive-message': (message: SocketMessage) => void;
 
-    'socket-error': (
-        error: SocketErrorPayload,
-    ) => void;
+    'socket-error': (error: SocketErrorPayload) => void;
 }

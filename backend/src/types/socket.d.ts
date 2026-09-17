@@ -5,6 +5,6 @@ declare module 'socket.io' {
         user: {
             userId: string;
             email: string;
-        }
+        };
     }
 }
