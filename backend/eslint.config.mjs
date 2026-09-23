@@ -4,6 +4,6 @@ import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default defineConfig({
-    files: ['src/**/*.ts'],
+    files: ['src/**/*.ts', 'tests/**/*.ts'],
     extends: [js.configs.recommended, tseslint.configs.recommended, eslintConfigPrettier],
 });
